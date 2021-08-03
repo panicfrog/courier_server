@@ -1,0 +1,2 @@
+[default.databases.kv_db]
+url = "mysql://kvuser:kvpassword@0.0.0.0/kvdb"
