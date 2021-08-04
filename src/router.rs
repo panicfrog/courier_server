@@ -2,6 +2,7 @@ use rocket::tokio::time::{sleep, Duration};
 use rocket::serde::{ Deserialize, Serialize, json::Json };
 use rocket::State;
 use rocket::response::status::Created;
+use rocket::request::Request;
 
 use super::db::{ Db, KV, query_latest_kv, insert_kv  };
 
@@ -19,4 +20,14 @@ pub async fn set_value(db: &State<Db>, data: Json<KV>) -> Result<Created<Json<KV
     let (key, value) = (data.key.as_str(), data.value.as_str());
     let _ = insert_kv(&**db, key, value).await?;
     Ok(Created::new("/").body(data))
+}
+
+#[catch(500)]
+pub fn internal_error() -> &'static str {
+    "Whoops! Looks like we messed up."
+}
+
+#[catch(400)]
+pub fn not_found(req: &Request) -> String {
+    format!("I couldn't find '{}'. Try something else?", req.uri())
 }
